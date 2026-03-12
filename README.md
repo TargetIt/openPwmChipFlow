@@ -19,6 +19,11 @@ openPwmChipFlow/
 ├── setup_env.sh                  ← 环境安装脚本
 ├── run_all.sh                    ← 一键全流程运行脚本
 │
+├── phase0_spec/                  ← Phase 0: 规格与需求定义
+│   ├── requirements.md           ← 需求文档
+│   ├── design_spec.md            ← 设计规格文档
+│   └── README.md
+│
 ├── phase1_rtl/                   ← Phase 1: RTL 编写
 │   ├── src/pwm_ctrl.v            ← PWM 控制器主设计文件
 │   └── README.md
@@ -110,6 +115,7 @@ chmod +x run_all.sh
 
 | 阶段 | 内容 | 工具 | 预计时间 |
 |------|------|------|----------|
+| Phase 0 | 规格与需求定义 | Markdown | 0.5 天 |
 | Phase 1 | RTL 编写 | VS Code + AI | 0.5 天 |
 | Phase 2 | 仿真验证 | iverilog + GTKWave | 1 天 |
 | Phase 3 | 综合 | Yosys (via OpenLane2) | 0.5 天 |
