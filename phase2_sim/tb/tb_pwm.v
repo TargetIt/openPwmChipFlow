@@ -23,7 +23,7 @@ module tb_pwm;
       total_count = 0;
       repeat (cycles) begin
         @(posedge clk);
-        #1;
+        #1;  // delta delay for signal stabilization after posedge clk
         total_count = total_count + 1;
         if (pwm_out) high_count = high_count + 1;
       end
@@ -73,7 +73,7 @@ module tb_pwm;
     // Test 6: Reset during operation
     $display("[TEST 6] Reset during operation");
     duty = 8'd0;
-    #100;
+    #100;  // wait ~10 clock cycles at 100MHz before asserting reset
     rst = 1;
     @(posedge clk); #1;
     if (pwm_out !== 1'b0) begin
