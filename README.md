@@ -18,6 +18,7 @@ openPwmChipFlow/
 ├── or.md                         ← 全流程开发策略文档
 ├── setup_env.sh                  ← 环境安装脚本
 ├── run_all.sh                    ← 一键全流程运行脚本
+├── scripts/health_check.sh        ← 快速健康检查脚本
 │
 ├── phase0_spec/                  ← Phase 0: 规格与需求定义
 │   ├── requirements.md           ← 需求文档
@@ -72,6 +73,24 @@ chmod +x setup_env.sh
 chmod +x run_all.sh
 ./run_all.sh
 ```
+
+### 2.5 建议先跑健康检查（持续迭代入口）
+
+```bash
+chmod +x scripts/health_check.sh
+./scripts/health_check.sh
+```
+
+Windows PowerShell 可运行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\health_check.ps1
+```
+
+该检查会快速验证：
+- 目录结构与关键文件完整性
+- OpenLane 配置关键字段（如 `PDK`、`CLOCK_PORT`）
+- 仿真冒烟测试（若安装了 iverilog）
 
 此脚本将按顺序执行 6 个阶段：
 1. ✅ 检查 RTL 文件
@@ -134,6 +153,7 @@ chmod +x run_all.sh
 - [ ] DRC clean — violation = 0
 - [ ] LVS clean — net/device match
 - [ ] GDS 生成 — KLayout 可正常打开版图
+- [ ] 健康检查通过 — `scripts/health_check.sh` 通过且无 FAIL
 
 ---
 

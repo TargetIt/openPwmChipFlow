@@ -14,6 +14,10 @@ module tb_pwm;
   integer high_count;
   integer total_count;
   integer test_pass;
+  real measured_pct;
+  real expected_pct;
+  real pct_error;
+  real tolerance_pct;
 
   task check_duty_cycle;
     input [7:0] expected_duty;
@@ -27,15 +31,29 @@ module tb_pwm;
         total_count = total_count + 1;
         if (pwm_out) high_count = high_count + 1;
       end
+      measured_pct = (100.0 * high_count) / total_count;
+      expected_pct = (100.0 * expected_duty) / 256.0;
+      pct_error = measured_pct - expected_pct;
+      if (pct_error < 0.0) pct_error = -pct_error;
       $display("  duty=%0d: high=%0d/%0d (%.1f%%)", expected_duty,
                high_count, total_count,
-               100.0 * high_count / total_count);
+               measured_pct);
+
+      if (pct_error > tolerance_pct) begin
+        $display("  FAIL: expected %.2f%%, measured %.2f%%, error %.2f%% > tolerance %.2f%%",
+                 expected_pct, measured_pct, pct_error, tolerance_pct);
+        test_pass = 0;
+      end else begin
+        $display("  PASS: expected %.2f%%, measured %.2f%%, error %.2f%%",
+                 expected_pct, measured_pct, pct_error);
+      end
     end
   endtask
 
   initial begin
     $dumpfile("wave.vcd"); $dumpvars;
     test_pass = 1;
+    tolerance_pct = 0.5;  // With 256-cycle window, quantization error is <= 0.39%.
 
     // Test 1: Reset behavior
     $display("[TEST 1] Reset behavior");
@@ -86,10 +104,13 @@ module tb_pwm;
     duty = 8'd128;
     check_duty_cycle(128, 256);
 
-    if (test_pass)
+    if (test_pass) begin
       $display("\n=== ALL TESTS PASSED ===");
-    else
+      $finish_and_return(0);
+    end else begin
       $display("\n=== SOME TESTS FAILED ===");
+      $finish_and_return(1);
+    end
 
     $finish;
   end

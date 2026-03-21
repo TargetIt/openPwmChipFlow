@@ -3,6 +3,6 @@
   "VERILOG_FILES": ["dir::../../phase1_rtl/src/pwm_ctrl.v"],
   "CLOCK_PORT": "clk",
   "CLOCK_PERIOD": 20.0,
-  "pdk": "sky130A",
+  "PDK": "sky130A",
   "STD_CELL_LIBRARY": "sky130_fd_sc_hd"
 }

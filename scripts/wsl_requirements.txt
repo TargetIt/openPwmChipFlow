@@ -1,0 +1,7 @@
+# command|apt_package|purpose
+iverilog|iverilog|Verilog simulation compiler
+# Optional for waveform GUI in WSLg/desktop forwarding
+gtkwave|gtkwave|Waveform viewer
+klayout|klayout|GDS viewer
+# OpenLane2 runtime
+docker|docker.io|Container runtime for OpenLane2
