@@ -1,0 +1,21 @@
+VCD info: dumpfile wave.vcd opened for output.
+[TEST 1] Reset behavior
+  PASS: pwm_out is 0 during reset
+[TEST 2] 50% duty cycle (duty=128)
+  duty=128: high=128/256 (50.0%)
+  PASS: expected 50.00%, measured 50.00%, error 0.00%
+[TEST 3] 25% duty cycle (duty=64)
+  duty=64: high=64/256 (25.0%)
+  PASS: expected 25.00%, measured 25.00%, error 0.00%
+[TEST 4] 0% duty cycle (duty=0)
+  duty=0: high=0/256 (0.0%)
+  PASS: expected 0.00%, measured 0.00%, error 0.00%
+[TEST 5] ~100% duty cycle (duty=255)
+  duty=255: high=255/256 (99.6%)
+  PASS: expected 99.61%, measured 99.61%, error 0.00%
+[TEST 6] Reset during operation
+  PASS: counter reset confirmed, pwm_out is 0
+  duty=128: high=128/256 (50.0%)
+  PASS: expected 50.00%, measured 50.00%, error 0.00%
+
+=== ALL TESTS PASSED ===

@@ -1,0 +1,213 @@
+VERSION 5.7 ;
+  NOWIREEXTENSIONATPIN ON ;
+  DIVIDERCHAR "/" ;
+  BUSBITCHARS "[]" ;
+MACRO pwm_ctrl
+  CLASS BLOCK ;
+  FOREIGN pwm_ctrl ;
+  ORIGIN 0.000 0.000 ;
+  SIZE 44.965 BY 55.685 ;
+  PIN VGND
+    DIRECTION INOUT ;
+    USE GROUND ;
+    PORT
+      LAYER met4 ;
+        RECT 12.215 10.640 13.815 43.760 ;
+    END
+    PORT
+      LAYER met4 ;
+        RECT 20.610 10.640 22.210 43.760 ;
+    END
+    PORT
+      LAYER met4 ;
+        RECT 29.005 10.640 30.605 43.760 ;
+    END
+    PORT
+      LAYER met4 ;
+        RECT 37.400 10.640 39.000 43.760 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 17.460 39.340 19.060 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 25.620 39.340 27.220 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 33.780 39.340 35.380 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 41.940 39.340 43.540 ;
+    END
+  END VGND
+  PIN VPWR
+    DIRECTION INOUT ;
+    USE POWER ;
+    PORT
+      LAYER met4 ;
+        RECT 8.915 10.640 10.515 43.760 ;
+    END
+    PORT
+      LAYER met4 ;
+        RECT 17.310 10.640 18.910 43.760 ;
+    END
+    PORT
+      LAYER met4 ;
+        RECT 25.705 10.640 27.305 43.760 ;
+    END
+    PORT
+      LAYER met4 ;
+        RECT 34.100 10.640 35.700 43.760 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 14.160 39.340 15.760 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 22.320 39.340 23.920 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 30.480 39.340 32.080 ;
+    END
+    PORT
+      LAYER met5 ;
+        RECT 5.280 38.640 39.340 40.240 ;
+    END
+  END VPWR
+  PIN clk
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.852000 ;
+    PORT
+      LAYER met3 ;
+        RECT 0.000 34.040 4.000 34.640 ;
+    END
+  END clk
+  PIN duty[0]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 34.040 44.965 34.640 ;
+    END
+  END duty[0]
+  PIN duty[1]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met2 ;
+        RECT 25.850 51.685 26.130 55.685 ;
+    END
+  END duty[1]
+  PIN duty[2]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 40.840 44.965 41.440 ;
+    END
+  END duty[2]
+  PIN duty[3]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 37.440 44.965 38.040 ;
+    END
+  END duty[3]
+  PIN duty[4]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 23.840 44.965 24.440 ;
+    END
+  END duty[4]
+  PIN duty[5]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 17.040 44.965 17.640 ;
+    END
+  END duty[5]
+  PIN duty[6]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 20.440 44.965 21.040 ;
+    END
+  END duty[6]
+  PIN duty[7]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.196500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 13.640 44.965 14.240 ;
+    END
+  END duty[7]
+  PIN pwm_out
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    ANTENNADIFFAREA 0.445500 ;
+    PORT
+      LAYER met3 ;
+        RECT 40.965 30.640 44.965 31.240 ;
+    END
+  END pwm_out
+  PIN rst
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    ANTENNAGATEAREA 0.213000 ;
+    PORT
+      LAYER met3 ;
+        RECT 0.000 30.640 4.000 31.240 ;
+    END
+  END rst
+  OBS
+      LAYER nwell ;
+        RECT 5.330 10.795 39.290 43.605 ;
+      LAYER li1 ;
+        RECT 5.520 10.795 39.100 43.605 ;
+      LAYER met1 ;
+        RECT 4.210 10.640 39.950 43.760 ;
+      LAYER met2 ;
+        RECT 4.230 51.405 25.570 51.685 ;
+        RECT 26.410 51.405 39.930 51.685 ;
+        RECT 4.230 10.695 39.930 51.405 ;
+      LAYER met3 ;
+        RECT 3.990 41.840 40.965 43.685 ;
+        RECT 3.990 40.440 40.565 41.840 ;
+        RECT 3.990 38.440 40.965 40.440 ;
+        RECT 3.990 37.040 40.565 38.440 ;
+        RECT 3.990 35.040 40.965 37.040 ;
+        RECT 4.400 33.640 40.565 35.040 ;
+        RECT 3.990 31.640 40.965 33.640 ;
+        RECT 4.400 30.240 40.565 31.640 ;
+        RECT 3.990 24.840 40.965 30.240 ;
+        RECT 3.990 23.440 40.565 24.840 ;
+        RECT 3.990 21.440 40.965 23.440 ;
+        RECT 3.990 20.040 40.565 21.440 ;
+        RECT 3.990 18.040 40.965 20.040 ;
+        RECT 3.990 16.640 40.565 18.040 ;
+        RECT 3.990 14.640 40.965 16.640 ;
+        RECT 3.990 13.240 40.565 14.640 ;
+        RECT 3.990 10.715 40.965 13.240 ;
+  END
+END pwm_ctrl
+END LIBRARY
+

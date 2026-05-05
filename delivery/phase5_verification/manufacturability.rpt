@@ -1,0 +1,19 @@
+Design Name: pwm_ctrl
+Run Directory: /work/openlane/pwm_ctrl/runs/RUN_2026.05.04_17.02.01
+----------------------------------------
+
+Magic DRC Summary:
+Source: /work/openlane/pwm_ctrl/runs/RUN_2026.05.04_17.02.01/reports/signoff/drc.rpt
+Total Magic DRC violations is 0
+----------------------------------------
+
+LVS Summary:
+Source: /work/openlane/pwm_ctrl/runs/RUN_2026.05.04_17.02.01/logs/signoff/41-pwm_ctrl.lef.lvs.log
+Number of nets: 88                         |Number of nets: 88                         
+Design is LVS clean.
+----------------------------------------
+
+Antenna Summary:
+Source: /work/openlane/pwm_ctrl/runs/RUN_2026.05.04_17.02.01/logs/signoff/44-arc.log
+Pin violations: 0
+Net violations: 0
