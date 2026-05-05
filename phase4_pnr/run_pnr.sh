@@ -1,48 +1,48 @@
 #!/bin/bash
 # Phase 4: PWM 布局布线脚本
-# 使用 OpenLane2 (Docker) 运行完整 RTL → GDS 流程
+# 使用 OpenLane (Docker) 运行完整 RTL -> GDS 流程
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-CONFIG="$SCRIPT_DIR/openlane/config.json"
+DESIGN_DIR="$PROJECT_ROOT/openlane/pwm_ctrl"
+VOLARE_DIR="$HOME/.volare"
 
 echo "========================================"
-echo "  Phase 4: PWM 布局布线 (OpenROAD via OpenLane2)"
+echo "  Phase 4: PWM 布局布线 (OpenROAD via OpenLane)"
 echo "========================================"
 
-# 检查 Docker 是否安装
 if ! command -v docker &> /dev/null; then
     echo "[ERROR] Docker 未安装。请先安装 Docker。"
-    echo "  参考: https://docs.docker.com/get-docker/"
     exit 1
 fi
 
-# 检查 OpenLane2 镜像
-if ! docker image inspect efabless/openlane2:latest &> /dev/null; then
-    echo "[INFO] OpenLane2 Docker 镜像不存在，正在拉取..."
-    docker pull efabless/openlane2:latest
+if ! docker image inspect efabless/openlane:latest &> /dev/null; then
+    echo "[INFO] OpenLane Docker 镜像不存在，正在拉取..."
+    docker pull efabless/openlane:latest
 fi
 
-# 检查配置文件
-if [ ! -f "$CONFIG" ]; then
-    echo "[ERROR] 配置文件不存在: $CONFIG"
+if [ ! -f "$DESIGN_DIR/config_pnr.tcl" ]; then
+    echo "[ERROR] 配置文件不存在: $DESIGN_DIR/config_pnr.tcl"
     exit 1
 fi
 
-# 运行完整 PnR 流程
-echo "[1/2] 启动 OpenLane2 完整流程 (RTL → GDS)..."
+# Use PnR-optimized config
+cp "$DESIGN_DIR/config_pnr.tcl" "$DESIGN_DIR/config.tcl"
+
+echo "[1/2] 启动 OpenLane 完整流程 (RTL -> GDS)..."
 docker run --rm \
     -v "$PROJECT_ROOT":/work \
-    -w /work/phase4_pnr \
-    efabless/openlane2:latest \
-    openlane /work/phase4_pnr/openlane/config.json
+    -v "$VOLARE_DIR":/root/.volare \
+    -e PDK_ROOT=/root/.volare/volare/sky130/versions/c6d73a35f524070e85faff4a6a9eef49553ebc2b \
+    -w /work/openlane/pwm_ctrl \
+    efabless/openlane:latest \
+    flow.tcl
 
-echo "[2/2] 检查 PnR 报告..."
 echo ""
 echo "========================================"
 echo "  布局布线完成！"
-echo "  报告位于: phase4_pnr/runs/ 目录下"
+echo "  报告位于: openlane/pwm_ctrl/runs/ 目录下"
 echo "========================================"
 echo ""
 echo "配置参数："

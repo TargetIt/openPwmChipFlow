@@ -63,10 +63,10 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Phase 5: 物理验证"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [ -d "$PROJECT_ROOT/phase4_pnr/runs" ]; then
+if [ -d "$PROJECT_ROOT/openlane/pwm_ctrl/runs" ]; then
     bash "$PROJECT_ROOT/phase5_verification/run_verify.sh"
 else
-    echo "  [SKIP] Phase 4 未完成，跳过物理验证"
+    echo "  [SKIP] Phase 3/4 未完成，跳过物理验证"
 fi
 echo ""
 
@@ -74,10 +74,10 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Phase 6: GDS 输出"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if [ -d "$PROJECT_ROOT/phase4_pnr/runs" ]; then
+if [ -d "$PROJECT_ROOT/openlane/pwm_ctrl/runs" ]; then
     bash "$PROJECT_ROOT/phase6_gds/run_gds.sh"
 else
-    echo "  [SKIP] Phase 4 未完成，跳过 GDS 输出"
+    echo "  [SKIP] Phase 3/4 未完成，跳过 GDS 输出"
 fi
 echo ""
 

@@ -1,0 +1,8 @@
+# Shell scripts must use LF line endings for Linux/WSL compatibility
+*.sh text eol=lf
+
+# TCL configs also LF
+*.tcl text eol=lf
+
+# Markdown files
+*.md text eol=lf
