@@ -129,6 +129,60 @@ delivery/
 
 ---
 
+## 版图截图 (`images/`)
+
+> 由 KLayout batch mode + Yosys 自动生成，共 21 张图片
+
+### 逐层版图（11 层金属 + 接触孔）
+
+| 图片 | GDS 层 | 说明 | 大小 |
+|------|--------|------|------|
+| `02_li1.png` | 67/20 | Local Interconnect (本地互联) | 99K |
+| `03_licon1.png` | 67/44 | LI Contact (金属接触) | 100K |
+| `04_met1.png` | 68/20 | Metal 1 (第一层金属, 最密) | 130K |
+| `05_via1.png` | 68/44 | Via1 (M1→M2 通孔) | 101K |
+| `06_met2.png` | 69/20 | Metal 2 (第二层金属) | 141K |
+| `07_via2.png` | 69/44 | Via2 (M2→M3 通孔) | 94K |
+| `08_met3.png` | 70/20 | Metal 3 (第三层金属) | 101K |
+| `09_via3.png` | 70/44 | Via3 (M3→M4 通孔) | 93K |
+| `10_met4.png` | 71/20 | Metal 4 (第四层金属) | 147K |
+| `11_via4.png` | 71/44 | Via4 (M4→M5 通孔) | 96K |
+| `12_met5.png` | 72/20 | Metal 5 (顶层金属) | 113K |
+
+### 组合视图与细节
+
+| 图片 | 说明 | 大小 |
+|------|------|------|
+| `01_full_chip.png` | 完整芯片版图 (全部层) | 327K |
+| `13_all_labels_outline.png` | 全部标签 + 引脚 + 边界 | 262K |
+| `14_met1_to_met2.png` | M1 → M2 堆叠 (晶体管级连接) | 188K |
+| `15_met2_to_met3.png` | M2 → M3 堆叠 | 152K |
+| `16_met3_to_met5.png` | M3 → M5 堆叠 (上层走线) | 192K |
+| `17_detail_top.png` | 芯片顶部区域放大 | 43K |
+| `18_detail_center.png` | 芯片中心区域放大 | 40K |
+| `19_detail_transistor.png` | 晶体管级细节 (li1+licon1+met1) | 60K |
+
+### 综合原理图
+
+| 图片 | 说明 | 大小 |
+|------|------|------|
+| `synthesis_hierarchy.png` | Yosys 综合后模块层次图 | 69K |
+| `synthesis_hierarchy.dot` | DOT 源文件 | 2.2K |
+
+**综合统计**: 4 cells ($add, $dff, $lt, $mux), 1 DFF
+
+### 物理设计指标
+
+| 指标 | 值 |
+|------|-----|
+| 工艺 | SkyWater 130nm (sky130A) |
+| 芯片面积 | 45.0µm × 55.7µm = 0.003 mm² |
+| 金属层 | li1 + met1–met5 (5 层金属 + 本地互联) |
+| 标准单元数 | 35 种 |
+| 总形状数 | 3,210 (21 层) |
+
+---
+
 ## 质量门禁汇总
 
 | 门禁项 | 目标 | 实测 | 状态 |
