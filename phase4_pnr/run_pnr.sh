@@ -1,48 +1,58 @@
 #!/bin/bash
 # Phase 4: PWM 布局布线脚本
-# 使用 OpenLane (Docker) 运行完整 RTL -> GDS 流程
+# 使用 OpenLane2 本地工具链运行完整 RTL -> GDS 流程
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DESIGN_DIR="$PROJECT_ROOT/openlane/pwm_ctrl"
-VOLARE_DIR="$HOME/.volare"
+CONFIG_FILE="$DESIGN_DIR/config.json"
+RUN_TAG="${OPENLANE_RUN_TAG:-RUN_phase4_pnr}"
+
+source "$PROJECT_ROOT/scripts/toolchain_env.sh"
 
 echo "========================================"
-echo "  Phase 4: PWM 布局布线 (OpenROAD via OpenLane)"
+echo "  Phase 4: PWM 布局布线 (OpenROAD via OpenLane2)"
 echo "========================================"
 
-if ! command -v docker &> /dev/null; then
-    echo "[ERROR] Docker 未安装。请先安装 Docker。"
+require_tool openlane "Install OpenLane2 or set OPENLANE_VENV to the venv containing openlane."
+require_tool yosys "Install OSS CAD Suite or set OSS_CAD_SUITE to its extracted directory."
+require_tool openroad "OpenROAD is required for floorplan/place/route."
+require_tool magic "Magic is required for GDS/DRC extraction."
+require_tool netgen "Netgen is required for LVS."
+require_pdk
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "[ERROR] 配置文件不存在: $CONFIG_FILE"
     exit 1
 fi
 
-if ! docker image inspect efabless/openlane:latest &> /dev/null; then
-    echo "[INFO] OpenLane Docker 镜像不存在，正在拉取..."
-    docker pull efabless/openlane:latest
-fi
+echo "  openlane : $(command -v openlane)"
+echo "  openroad : $(command -v openroad)"
+echo "  magic    : $(command -v magic)"
+echo "  netgen   : $(command -v netgen)"
+echo "  PDK_ROOT : $PDK_ROOT"
+echo "  run tag  : $RUN_TAG"
 
-if [ ! -f "$DESIGN_DIR/config_pnr.tcl" ]; then
-    echo "[ERROR] 配置文件不存在: $DESIGN_DIR/config_pnr.tcl"
-    exit 1
-fi
+echo "[1/2] 启动 OpenLane2 Classic 完整流程 (RTL -> GDS)..."
+openlane \
+    --manual-pdk \
+    --pdk-root "$PDK_ROOT" \
+    --pdk sky130A \
+    --scl sky130_fd_sc_hd \
+    --flow Classic \
+    --design-dir "$DESIGN_DIR" \
+    --run-tag "$RUN_TAG" \
+    --overwrite \
+    "$CONFIG_FILE"
 
-# Use PnR-optimized config
-cp "$DESIGN_DIR/config_pnr.tcl" "$DESIGN_DIR/config.tcl"
-
-echo "[1/2] 启动 OpenLane 完整流程 (RTL -> GDS)..."
-docker run --rm \
-    -v "$PROJECT_ROOT":/work \
-    -v "$VOLARE_DIR":/root/.volare \
-    -e PDK_ROOT=/root/.volare/volare/sky130/versions/c6d73a35f524070e85faff4a6a9eef49553ebc2b \
-    -w /work/openlane/pwm_ctrl \
-    efabless/openlane:latest \
-    flow.tcl
+echo "[2/2] 生成 PnR 报告..."
+bash "$SCRIPT_DIR/gen_report.sh"
 
 echo ""
 echo "========================================"
 echo "  布局布线完成！"
-echo "  报告位于: openlane/pwm_ctrl/runs/ 目录下"
+echo "  报告位于: phase4_pnr/report/pnr_report.md"
 echo "========================================"
 echo ""
 echo "配置参数："

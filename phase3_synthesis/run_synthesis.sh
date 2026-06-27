@@ -1,45 +1,55 @@
 #!/bin/bash
 # Phase 3: PWM 综合脚本
-# 使用 OpenLane (Docker) 运行 Yosys 综合到 GDS 全流程
+# 使用 OpenLane2 本地工具链运行到 Yosys 综合阶段
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DESIGN_DIR="$PROJECT_ROOT/openlane/pwm_ctrl"
-VOLARE_DIR="$HOME/.volare"
+CONFIG_FILE="$DESIGN_DIR/config.json"
+RUN_TAG="${OPENLANE_RUN_TAG:-RUN_phase3_synthesis}"
+
+source "$PROJECT_ROOT/scripts/toolchain_env.sh"
 
 echo "========================================"
-echo "  Phase 3: PWM 综合 (Yosys via OpenLane)"
+echo "  Phase 3: PWM 综合 (Yosys via OpenLane2)"
 echo "========================================"
 
-if ! command -v docker &> /dev/null; then
-    echo "[ERROR] Docker 未安装。请先安装 Docker。"
+require_tool openlane "Install OpenLane2 or set OPENLANE_VENV to the venv containing openlane."
+require_tool yosys "Install OSS CAD Suite or set OSS_CAD_SUITE to its extracted directory."
+require_tool verilator "Verilator lint is the first OpenLane2 Classic step."
+require_pdk
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "[ERROR] 配置文件不存在: $CONFIG_FILE"
     exit 1
 fi
 
-if ! docker image inspect efabless/openlane:latest &> /dev/null; then
-    echo "[INFO] OpenLane Docker 镜像不存在，正在拉取..."
-    docker pull efabless/openlane:latest
-fi
+echo "  openlane : $(command -v openlane)"
+echo "  yosys    : $(command -v yosys)"
+echo "  PDK_ROOT : $PDK_ROOT"
+echo "  run tag  : $RUN_TAG"
 
-if [ ! -f "$DESIGN_DIR/config.tcl" ]; then
-    echo "[ERROR] 配置文件不存在: $DESIGN_DIR/config.tcl"
-    exit 1
-fi
+echo "[1/2] 启动 OpenLane2 Classic flow，到 Yosys.Synthesis 停止..."
+openlane \
+    --manual-pdk \
+    --pdk-root "$PDK_ROOT" \
+    --pdk sky130A \
+    --scl sky130_fd_sc_hd \
+    --flow Classic \
+    --design-dir "$DESIGN_DIR" \
+    --run-tag "$RUN_TAG" \
+    --overwrite \
+    --to Yosys.Synthesis \
+    "$CONFIG_FILE"
 
-echo "[1/2] 启动 OpenLane 全流程 (RTL -> GDS)..."
-docker run --rm \
-    -v "$PROJECT_ROOT":/work \
-    -v "$VOLARE_DIR":/root/.volare \
-    -e PDK_ROOT=/root/.volare/volare/sky130/versions/c6d73a35f524070e85faff4a6a9eef49553ebc2b \
-    -w /work/openlane/pwm_ctrl \
-    efabless/openlane:latest \
-    flow.tcl
+echo "[2/2] 生成综合报告..."
+bash "$SCRIPT_DIR/gen_report.sh"
 
 echo ""
 echo "========================================"
 echo "  综合完成！"
-echo "  报告位于: openlane/pwm_ctrl/runs/ 目录下"
+echo "  报告位于: phase3_synthesis/report/synthesis_report.md"
 echo "========================================"
 echo ""
 echo "检查要点："

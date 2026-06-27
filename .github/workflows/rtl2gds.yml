@@ -1,0 +1,76 @@
+name: RTL to GDS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "phase1_rtl/**"
+      - "phase2_sim/**"
+      - "openlane/**"
+      - "phase3_synthesis/**"
+      - "phase4_pnr/**"
+      - "phase5_verification/**"
+      - "phase6_gds/**"
+      - ".github/workflows/rtl2gds.yml"
+
+jobs:
+  rtl2gds:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PDK_VERSION: 0fe599b2afb6708d281543108caf8310912f54af
+      PDK_ROOT_HOST: ${{ github.workspace }}/.volare
+      PDK_ROOT_DOCKER: /root/.volare/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install simulation and PDK tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog python3-pip
+          python3 -m pip install --user volare==0.20.6 klayout==0.29.12
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run RTL simulation
+        run: bash phase2_sim/run_sim.sh
+
+      - name: Fetch Sky130 PDK
+        run: |
+          volare enable --pdk-root "$PDK_ROOT_HOST" --pdk sky130 "$PDK_VERSION"
+
+      - name: Pull OpenLane image
+        run: docker pull efabless/openlane:latest
+
+      - name: Run OpenLane RTL-to-GDS
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE":/work \
+            -v "$PDK_ROOT_HOST":/root/.volare \
+            -e PDK_ROOT="$PDK_ROOT_DOCKER" \
+            -w /work/openlane/pwm_ctrl \
+            efabless/openlane:latest \
+            flow.tcl
+
+      - name: Generate reports
+        run: |
+          bash phase3_synthesis/gen_report.sh
+          bash phase4_pnr/gen_report.sh
+          bash phase5_verification/run_verify.sh
+          bash phase6_gds/run_gds.sh
+
+      - name: Upload RTL-to-GDS artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: openpwm-rtl2gds-${{ github.run_id }}
+          path: |
+            phase2_sim/test_report.md
+            phase2_sim/test_results.log
+            phase3_synthesis/report/
+            phase4_pnr/report/
+            phase5_verification/report/
+            phase6_gds/report/
+            openlane/pwm_ctrl/runs/

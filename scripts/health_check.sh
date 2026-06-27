@@ -8,6 +8,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+source "$PROJECT_ROOT/scripts/toolchain_env.sh"
+
 pass_count=0
 fail_count=0
 
@@ -45,6 +47,7 @@ check_path_exists "$PROJECT_ROOT/phase1_rtl/src/pwm_ctrl.v" "RTL source exists"
 check_path_exists "$PROJECT_ROOT/phase2_sim/tb/tb_pwm.v" "testbench exists"
 check_path_exists "$PROJECT_ROOT/phase3_synthesis/openlane/config.json" "phase3 OpenLane config exists"
 check_path_exists "$PROJECT_ROOT/phase4_pnr/openlane/config.json" "phase4 OpenLane config exists"
+check_path_exists "$PROJECT_ROOT/openlane/pwm_ctrl/config.json" "canonical OpenLane2 config exists"
 check_path_exists "$PROJECT_ROOT/run_all.sh" "top-level run_all.sh exists"
 
 echo ""
@@ -55,12 +58,16 @@ check_config_field "$PROJECT_ROOT/phase3_synthesis/openlane/config.json" "CLOCK_
 check_config_field "$PROJECT_ROOT/phase4_pnr/openlane/config.json" "DESIGN_NAME"
 check_config_field "$PROJECT_ROOT/phase4_pnr/openlane/config.json" "PDK"
 check_config_field "$PROJECT_ROOT/phase4_pnr/openlane/config.json" "CLOCK_PORT"
+check_config_field "$PROJECT_ROOT/openlane/pwm_ctrl/config.json" "DESIGN_NAME"
+check_config_field "$PROJECT_ROOT/openlane/pwm_ctrl/config.json" "PDK"
+check_config_field "$PROJECT_ROOT/openlane/pwm_ctrl/config.json" "CLOCK_PORT"
 
 echo ""
 echo "[3/4] Checking shell scripts..."
 for script in \
     "$PROJECT_ROOT/setup_env.sh" \
     "$PROJECT_ROOT/run_all.sh" \
+    "$PROJECT_ROOT/scripts/toolchain_env.sh" \
     "$PROJECT_ROOT/phase2_sim/run_sim.sh" \
     "$PROJECT_ROOT/phase3_synthesis/run_synthesis.sh" \
     "$PROJECT_ROOT/phase4_pnr/run_pnr.sh" \

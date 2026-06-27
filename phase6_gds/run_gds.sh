@@ -9,6 +9,8 @@ PNR_RUNS="$PROJECT_ROOT/openlane/pwm_ctrl/runs"
 REPORT_DIR="$SCRIPT_DIR/report"
 REPORT_FILE="$REPORT_DIR/gds_report.md"
 
+source "$PROJECT_ROOT/scripts/toolchain_env.sh"
+
 mkdir -p "$REPORT_DIR"
 
 echo "========================================"
@@ -31,6 +33,7 @@ echo "  运行目录: $RUN_NAME"
 
 FINAL="$LATEST_RUN/results/final"
 ALL_PRESENT=1
+GDS_READABLE=0
 
 check_file() {
     local file="$1"
@@ -57,6 +60,28 @@ check_file "$FINAL/lib/pwm_ctrl.lib" "LIB 时序库"
 check_file "$FINAL/def/pwm_ctrl.def" "DEF 设计交换"
 check_file "$FINAL/verilog/gl/pwm_ctrl.v" "门级网表"
 check_file "$FINAL/spi/lvs/pwm_ctrl.spice" "SPICE 网表"
+
+PYTHON_BIN="${PYTHON_BIN:-python}"
+
+if [ -f "$FINAL/gds/pwm_ctrl.gds" ]; then
+    if "$PYTHON_BIN" - "$FINAL/gds/pwm_ctrl.gds" <<'PY' 2>/dev/null; then
+import sys
+import klayout.db as pya
+
+layout = pya.Layout()
+layout.read(sys.argv[1])
+top = layout.top_cell()
+if top is None:
+    raise SystemExit(1)
+print(top.name)
+PY
+        echo "  ✅ KLayout Python 可读取 GDS"
+        GDS_READABLE=1
+    else
+        echo "  ❌ KLayout Python 无法读取 GDS"
+        ALL_PRESENT=0
+    fi
+fi
 
 # SDF files (nested: multicorner/{max,min,nom}/pwm_ctrl.{Fastest,Slowest,Typical}.sdf)
 SDF_COUNT=$(find "$FINAL/sdf/" -name '*.sdf' 2>/dev/null | wc -l)
@@ -140,8 +165,7 @@ magic $FINAL/mag/pwm_ctrl.mag
 | SPICE 网表 | $( [ -f "$FINAL/spi/lvs/pwm_ctrl.spice" ] && echo '✅' || echo '❌') |
 | SDF (多 corner) | $( [ "$SDF_COUNT" -gt 0 ] && echo '✅' || echo '❌') |
 | SPEF (多 corner) | $( [ "$SPEF_COUNT" -gt 0 ] && echo '✅' || echo '❌') |
-| DRC clean | ✅ |
-| LVS clean | ✅ |
+| GDS 可被 KLayout 读取 | $( [ "$GDS_READABLE" -eq 1 ] && echo '✅' || echo '❌') |
 
 ## 签核结论
 
@@ -165,3 +189,7 @@ echo "输出文件用途："
 echo "  - pwm_ctrl.gds -> 流片主文件"
 echo "  - pwm_ctrl.lef -> IP 集成接口"
 echo "  - pwm_ctrl.lib -> 时序模型"
+
+if [ "$ALL_PRESENT" -ne 1 ]; then
+    exit 1
+fi

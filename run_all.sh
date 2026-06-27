@@ -6,6 +6,8 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 SKIPPED_PHASES=0
 
+source "$PROJECT_ROOT/scripts/toolchain_env.sh"
+
 echo "╔══════════════════════════════════════════╗"
 echo "║  PWM 数字芯片全流程开发                    ║"
 echo "║  PWM Controller + Sky130 + OpenLane2      ║"
@@ -42,11 +44,11 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Phase 3: 综合"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if command -v docker &> /dev/null; then
+if command -v openlane >/dev/null 2>&1 && command -v yosys >/dev/null 2>&1; then
     bash "$PROJECT_ROOT/phase3_synthesis/run_synthesis.sh"
 else
-    echo "  [SKIP] Docker 未安装，跳过综合"
-    echo "  运行 ./setup_env.sh 安装依赖"
+    echo "  [SKIP] openlane/yosys 未安装，跳过综合"
+    echo "  设置 OPENLANE_VENV/OSS_CAD_SUITE/PDK_ROOT 后重跑"
     SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""
@@ -55,10 +57,11 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Phase 4: 布局布线"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-if command -v docker &> /dev/null; then
+if command -v openlane >/dev/null 2>&1 && command -v openroad >/dev/null 2>&1 && command -v magic >/dev/null 2>&1 && command -v netgen >/dev/null 2>&1; then
     bash "$PROJECT_ROOT/phase4_pnr/run_pnr.sh"
 else
-    echo "  [SKIP] Docker 未安装，跳过布局布线"
+    echo "  [SKIP] openlane/openroad/magic/netgen 未安装，跳过布局布线"
+    echo "  设置 OPENLANE_VENV/OSS_CAD_SUITE/PDK_ROOT 后重跑"
     SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""

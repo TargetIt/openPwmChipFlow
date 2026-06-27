@@ -32,6 +32,10 @@ echo "  运行目录: $RUN_NAME"
 overall_pass=1
 declare -A RESULTS
 
+result_passed() {
+    [[ "$1" == *"PASS"* ]]
+}
+
 # ----- DRC Check -----
 echo ""
 echo "[1/4] 检查 Magic DRC..."
@@ -192,10 +196,10 @@ cat > "$REPORT_FILE" << EOF
 
 | 检查项 | 状态 |
 |--------|------|
-| DRC violations = 0 | $( [ "${RESULTS['Magic DRC']}" = *PASS* ] && echo '✅' || echo '❌') |
-| LVS net/device match | $( [ "${RESULTS['LVS']}" = *PASS* ] && echo '✅' || echo '❌') |
-| 无 Antenna 违例 | $( [ "${RESULTS['Antenna']}" = *PASS* ] && echo '✅' || echo '❌') |
-| KLayout 交叉验证一致 | $( [ "${RESULTS['KLayout DRC']}" = *PASS* ] && echo '✅' || echo '❌') |
+| DRC violations = 0 | $( result_passed "${RESULTS["Magic DRC"]}" && echo '✅' || echo '❌') |
+| LVS net/device match | $( result_passed "${RESULTS["LVS"]}" && echo '✅' || echo '❌') |
+| 无 Antenna 违例 | $( result_passed "${RESULTS["Antenna"]}" && echo '✅' || echo '❌') |
+| KLayout 交叉验证一致 | $( result_passed "${RESULTS["KLayout DRC"]}" && echo '✅' || echo '❌') |
 
 ## 总体结论
 

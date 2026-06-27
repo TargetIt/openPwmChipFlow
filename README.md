@@ -62,10 +62,11 @@ chmod +x setup_env.sh
 ./setup_env.sh
 ```
 
-此脚本将自动安装：
+此脚本主要面向 Linux/WSL 环境。当前 Harness 推荐的可复现实验路径是用户本地工具链：
 - **iverilog** — Verilog 仿真编译器
-- **GTKWave** — 波形查看器
-- **Docker** — OpenLane2 运行环境（需手动安装）
+- **OpenLane2 Python CLI** — 流程编排
+- **OSS CAD Suite** — `yosys/openroad/magic/netgen/verilator` 等 EDA 二进制工具
+- **Sky130 PDK** — 通过 Volare 目录结构放在 `PDK_ROOT`
 
 ### 2. 一键运行全流程
 
@@ -95,8 +96,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\health_check.ps1
 此脚本将按顺序执行 6 个阶段：
 1. ✅ 检查 RTL 文件
 2. 🔄 运行仿真验证（需要 iverilog）
-3. 🔄 运行综合（需要 Docker + OpenLane2）
-4. 🔄 运行布局布线（需要 Docker + OpenLane2）
+3. 🔄 运行综合（需要 OpenLane2 + OSS CAD Suite + Sky130 PDK）
+4. 🔄 运行布局布线（需要 OpenLane2 + OSS CAD Suite + Sky130 PDK）
 5. 🔄 检查物理验证报告
 6. 🔄 检查 GDS 输出文件
 
@@ -108,10 +109,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\health_check.ps1
 # Phase 2: 仿真验证（仅需 iverilog，无需 Docker）
 ./phase2_sim/run_sim.sh
 
-# Phase 3: 综合（需要 Docker + OpenLane2）
+# Phase 3: 综合（需要本地 OpenLane2 工具链）
 ./phase3_synthesis/run_synthesis.sh
 
-# Phase 4: 布局布线（需要 Docker + OpenLane2）
+# Phase 4: 布局布线（需要本地 OpenLane2 工具链）
 ./phase4_pnr/run_pnr.sh
 
 # Phase 5: 物理验证
@@ -125,10 +126,11 @@ powershell -ExecutionPolicy Bypass -File .\scripts\health_check.ps1
 
 | 工具 | 用途 | 安装方式 |
 |------|------|----------|
-| iverilog | RTL 仿真 | `sudo apt install iverilog` |
-| GTKWave | 波形查看 | `sudo apt install gtkwave` |
-| OpenLane2 | 全流程框架 | `docker pull efabless/openlane2:latest` |
-| KLayout | GDS 查看 | `sudo apt install klayout` |
+| iverilog | RTL 仿真 | 系统包或用户本地构建 |
+| OpenLane2 | 全流程框架 | Python venv 中安装 `openlane` |
+| OSS CAD Suite | EDA 二进制工具集合 | 解压到 `$HOME/tools/oss-cad-suite` 或设置 `OSS_CAD_SUITE` |
+| Sky130 PDK | 工艺库 | 放在 `$HOME/tools/pdks` 或设置 `PDK_ROOT` |
+| KLayout | GDS 查看/读取 | OSS CAD Suite 或 Python `klayout` 包 |
 
 ## 全流程时间线
 

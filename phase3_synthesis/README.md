@@ -8,8 +8,9 @@
 
 | 工具 | 用途 | 安装方式 |
 |------|------|----------|
-| Docker | 容器运行环境 | [安装指南](https://docs.docker.com/get-docker/) |
-| OpenLane2 | EDA 全流程框架 | `docker pull efabless/openlane2:latest` |
+| OpenLane2 | EDA 全流程框架 | Python venv 中安装 `openlane` |
+| OSS CAD Suite | Yosys/Verilator 等二进制工具 | 解压后设置 `OSS_CAD_SUITE` |
+| Sky130 PDK | 工艺库 | 设置 `PDK_ROOT` 或 `OPENLANE_PDK_ROOT` |
 
 ## 一键运行
 
