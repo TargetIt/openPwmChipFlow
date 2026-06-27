@@ -40,6 +40,11 @@ jobs:
       - name: Fetch Sky130 PDK
         run: |
           volare enable --pdk-root "$PDK_ROOT_HOST" --pdk sky130 "$PDK_VERSION"
+          test -f "$PDK_ROOT_HOST/volare/sky130/versions/$PDK_VERSION/sky130A/libs.tech/magic/sky130A.tech"
+          if grep -R "c6d73a35f524070e85faff4a6a9eef49553ebc2b" openlane/pwm_ctrl/*.tcl; then
+            echo "OpenLane config must not hard-code a PDK_ROOT from an old run." >&2
+            exit 1
+          fi
 
       - name: Pull OpenLane image
         run: docker pull efabless/openlane:latest
