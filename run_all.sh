@@ -4,6 +4,7 @@
 set -e
 
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
+SKIPPED_PHASES=0
 
 echo "╔══════════════════════════════════════════╗"
 echo "║  PWM 数字芯片全流程开发                    ║"
@@ -33,6 +34,7 @@ if command -v iverilog &> /dev/null; then
 else
     echo "  [SKIP] iverilog 未安装，跳过仿真"
     echo "  运行 ./setup_env.sh 安装依赖"
+    SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""
 
@@ -45,6 +47,7 @@ if command -v docker &> /dev/null; then
 else
     echo "  [SKIP] Docker 未安装，跳过综合"
     echo "  运行 ./setup_env.sh 安装依赖"
+    SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""
 
@@ -56,6 +59,7 @@ if command -v docker &> /dev/null; then
     bash "$PROJECT_ROOT/phase4_pnr/run_pnr.sh"
 else
     echo "  [SKIP] Docker 未安装，跳过布局布线"
+    SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""
 
@@ -67,6 +71,7 @@ if [ -d "$PROJECT_ROOT/openlane/pwm_ctrl/runs" ]; then
     bash "$PROJECT_ROOT/phase5_verification/run_verify.sh"
 else
     echo "  [SKIP] Phase 3/4 未完成，跳过物理验证"
+    SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""
 
@@ -78,10 +83,19 @@ if [ -d "$PROJECT_ROOT/openlane/pwm_ctrl/runs" ]; then
     bash "$PROJECT_ROOT/phase6_gds/run_gds.sh"
 else
     echo "  [SKIP] Phase 3/4 未完成，跳过 GDS 输出"
+    SKIPPED_PHASES=$((SKIPPED_PHASES + 1))
 fi
 echo ""
 
 # ======== 完成 ========
-echo "╔══════════════════════════════════════════╗"
-echo "║  全流程执行完毕 🎉                        ║"
-echo "╚══════════════════════════════════════════╝"
+if [ "$SKIPPED_PHASES" -eq 0 ]; then
+    echo "╔══════════════════════════════════════════╗"
+    echo "║  全流程执行完毕                           ║"
+    echo "╚══════════════════════════════════════════╝"
+else
+    echo "╔══════════════════════════════════════════╗"
+    echo "║  部分流程完成：存在 $SKIPPED_PHASES 个跳过阶段          ║"
+    echo "╚══════════════════════════════════════════╝"
+    echo "请补齐缺失工具后重跑，跳过阶段不能视为流片出口证据。"
+    exit 2
+fi
