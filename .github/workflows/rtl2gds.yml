@@ -46,6 +46,7 @@ jobs:
 
       - name: Run OpenLane RTL-to-GDS
         run: |
+          set +e
           docker run --rm \
             -v "$GITHUB_WORKSPACE":/work \
             -v "$PDK_ROOT_HOST":/root/.volare \
@@ -53,6 +54,27 @@ jobs:
             -w /work/openlane/pwm_ctrl \
             efabless/openlane:latest \
             flow.tcl
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "::group::OpenLane failure logs"
+            latest_run="$(ls -td openlane/pwm_ctrl/runs/RUN_* 2>/dev/null | head -1 || true)"
+            echo "Latest run: ${latest_run:-none}"
+            if [ -n "$latest_run" ]; then
+              find "$latest_run/logs" -type f | sort | tail -40
+              for log in \
+                "$latest_run/logs/signoff/35-gdsii.log" \
+                "$latest_run/logs/signoff/36-gds-klayout.log" \
+                "$latest_run/logs/routing/26-detailed.log" \
+                "$latest_run/logs/synthesis/1-synthesis.log"; do
+                if [ -f "$log" ]; then
+                  echo "===== $log ====="
+                  tail -200 "$log"
+                fi
+              done
+            fi
+            echo "::endgroup::"
+          fi
+          exit "$status"
 
       - name: Generate reports
         run: |
