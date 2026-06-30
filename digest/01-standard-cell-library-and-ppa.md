@@ -76,7 +76,7 @@ Yosys/ABC 会把它变成加法器、比较器、触发器和若干组合逻辑�
 
 | 指标 | `sky130_fd_sc_hd` 的含义 |
 | --- | --- |
-| cell site | 约 `0.46 x 2.72 um`，8-grid cell height |
+| cell site | 约 `0.46um x 2.72um = 1.2512 um²`，8-grid cell height |
 | 定位 | high density |
 | routed gate density | 160 kGates/mm² 或更高 |
 | leakage | 文档给出约 `0.86 nA/kGate` 的典型级别说明 |
@@ -149,6 +149,16 @@ PWM 这个项目很小，所以 PPA 不像大芯片那样复杂，但它正好�
 
 注意：早期自动报告里有字段误读，把 `(Cell/mm^2)/Core_Util` 当成面积，这是不对的。面积请优先看 `DIEAREA_mm^2` 和 `CoreArea_um^2`。
 
+面积单位要特别小心：
+
+```text
+1 mm = 1000 um
+1 mm² = 1,000,000 um²
+0.002503876 mm² = 2503.876 um²
+```
+
+所以本项目的 die 面积约 `2503.876 um²`，core 面积约 `1096.0512 um²`。die 是外框，core 是里面真正摆标准单元和布线的核心区域。
+
 ## 7. 本项目综合后用了哪些真实标准单元
 
 从 `delivery/phase3_synthesis/pwm_ctrl_synth.v` 统计，综合后共 53 个 `sky130_fd_sc_hd` 单元：
@@ -179,9 +189,9 @@ PWM 这个项目很小，所以 PPA 不像大芯片那样复杂，但它正好�
 
 ## 8. 单元面积、电容、漏电从哪里来
 
-以本地 `sky130_fd_sc_hd__tt_025C_1v80.lib` 中几个单元为例：
+以本地 `sky130_fd_sc_hd__tt_025C_1v80.lib` 中几个单元为例。Liberty 里的 `area` 对 SKY130 标准单元可以按 `um²` 理解：
 
-| 单元 | area | leakage power | 输入/输出电容示例 |
+| 单元 | area (um²) | leakage power | 输入/输出电容示例 |
 | --- | ---: | ---: | --- |
 | `dfxtp_2` | `21.2704` | `0.008444527 pW` | `CLK=0.001787 pF`, `D=0.001677 pF` |
 | `inv_2` | `3.7536` | `0.004247907 pW` | `A=0.004459 pF` |
@@ -192,7 +202,7 @@ PWM 这个项目很小，所以 PPA 不像大芯片那样复杂，但它正好�
 
 这些数字的意义：
 
-- `area`：这个 cell 在标准单元 row 中占多少面积单位。
+- `area`：这个 cell 在标准单元 row 中占多少面积，单位是 `um²`。例如一个 site 约 `1.2512 um²`，`inv_2` 的面积 `3.7536 um²` 大约是 3 个 site。
 - `capacitance`：驱动这个 pin 需要搬多少电荷。电容越大，前一级越吃力。
 - `cell_leakage_power`：静态不切换时也会漏掉的功耗。
 - delay table：不同输入 slew、不同输出 load 下，cell 延时是多少。
