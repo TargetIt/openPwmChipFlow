@@ -196,19 +196,19 @@ PWM 这个项目很小，所以 PPA 不像大芯片那样复杂，但它正好�
 
 | 指标 | 值 | 怎么理解 |
 | --- | ---: | --- |
-| `STD_CELL_LIBRARY` | `sky130_fd_sc_hd` | 用的标准单元库 |
-| `CLOCK_PERIOD` | `20.0 ns` | 目标时钟周期，等价 50 MHz |
-| `critical_path_ns` | `0.86 ns` | 工具统计的关键路径延时量级 |
-| `wns` / `tns` | `0.0 / 0.0` | 无 setup 违例 |
-| `spef_wns` / `spef_tns` | `0.0 / 0.0` | 提取寄生后仍无违例 |
-| `synth_cell_count` | `53` | 综合后非物理逻辑单元数量 |
-| `TotalCells` | `220` | PnR 后总 component，含 fill/decap/tap/clock buffer |
-| `CoreArea_um^2` | `1096.0512 um²` | core 面积 |
-| `DIEAREA_mm^2` | `0.002503876 mm²` | die 面积 |
-| `Final_Util` | `61.758%` | 最终利用率 |
-| `wire_length` | `1190 um` | 总走线长度 |
-| `vias` | `498` | 过孔数量 |
-| `Magic/KLayout/LVS/Antenna` | `0/0/0/0` | 物理验证通过 |
+| `STD_CELL_LIBRARY` | `sky130_fd_sc_hd` | 这是综合和后端真正使用的标准单元库。它决定工具能选择哪些门、触发器、buffer、fill、tap、decap，也决定这些单元的面积、pin 电容、delay table、功耗模型。换句话说，同一份 RTL 换一个库，PPA 结果会变。 |
+| `CLOCK_PERIOD` | `20.0 ns` | 这是给 STA 的目标节拍，不是工具测出来的速度。`20ns` 等价 `50MHz`，意思是所有同步路径最好在一个 20ns 周期内完成。这个约束越小，要求越严格，工具可能会用更大更快的 cell 或更多 buffer 来追时序。 |
+| `critical_path_ns` | `0.86 ns` | 这是工具统计的关键路径延时量级，可以理解为“本设计里最慢那条主要数据路大约要走多久”。它远小于 20ns，说明这个 PWM 对当前时钟约束非常宽松。注意它不是最终最大频率的唯一依据，还要结合 clock uncertainty、setup/hold、SPEF 寄生和不同 corner。 |
+| `wns` / `tns` | `0.0 / 0.0` | `WNS` 看最差路径有没有负 slack，`TNS` 看所有失败路径累计差多少。这里都是 0，表示没有 setup 违例。直觉上就是：所有需要在下一拍前到达的数据，都按当前约束赶上了。 |
+| `spef_wns` / `spef_tns` | `0.0 / 0.0` | 这是把布局布线后的线电阻/电容寄生参数加入 STA 后的结果。综合阶段可能低估线延时，SPEF 后仍为 0，说明真实布线带来的额外延时没有把路径推成违例。 |
+| `synth_cell_count` | `53` | 这是综合后的功能逻辑单元数量，主要包括触发器和组合逻辑门。它回答“实现 PWM 功能本身大概用了多少逻辑积木”，不包括后端为了制造、电源、布线额外加的 filler、tap、decap 等物理单元。 |
+| `TotalCells` | `220` | 这是 PnR 后 DEF 里的总 component 数。它比 `53` 大很多，因为后端加入了 `decap`、`fill`、`tap`、clock buffer、普通 buffer 等。它回答“最终版图里一共摆了多少个物理组件”，不是单纯功能逻辑数量。 |
+| `CoreArea_um^2` | `1096.0512 um²` | core 是真正放标准单元 row、布线和电源网络的核心区域。这个面积越大，工具越容易摆放和布线，但芯片更大；越小，面积省了，但拥塞、时序、DRC 难度会上升。 |
+| `DIEAREA_mm^2` | `0.002503876 mm²` | die 是整个设计外框，比 core 更外层，包含 core、边界和必要留白。换算后约 `2503.876 um²`。看芯片成本时更关注 die area，因为晶圆上一片 die 占多少面积直接影响成本。 |
+| `Final_Util` | `61.758%` | 最终利用率可以粗略理解为 core 里有多少比例被 cell 占用。太低浪费面积，太高会拥挤、难布线、时序难收敛。`61.758%` 对这个小设计来说是比较正常的后端利用率。 |
+| `wire_length` | `1190 um` | 这是布线总长度。线越长，通常电阻/电容越大，延时和动态功耗也可能更高。这个指标帮助判断 placement/routing 是否把相关 cell 放得太远。 |
+| `vias` | `498` | via 是不同金属层之间的上下连接点。via 多不等于错误，但每个 via 都带来额外电阻、电容和制造复杂度。它反映布线跨层程度，过多时可能影响时序、可靠性和可制造性。 |
+| `Magic/KLayout/LVS/Antenna` | `0/0/0/0` | 这些是后端签核质量门禁：DRC 看几何规则，LVS 看版图和网表是否一致，Antenna 看制造过程中的天线效应风险。全为 0 表示当前产物在这些检查上没有发现违例。 |
 
 注意：早期自动报告里有字段误读，把 `(Cell/mm^2)/Core_Util` 当成面积，这是不对的。面积请优先看 `DIEAREA_mm^2` 和 `CoreArea_um^2`。
 
